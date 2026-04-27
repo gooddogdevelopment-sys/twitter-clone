@@ -1,0 +1,42 @@
+services:
+  # ── Backend (NestJS) ────────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend/twitter-clone-api
+      dockerfile: Dockerfile
+      target: production
+    container_name: twitter-clone-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    ports:
+      - "4000:3000"
+    networks:
+      - twitter-clone-network
+
+  # ── Frontend (Next.js) ──────────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend/twitter-clone-ui
+      dockerfile: Dockerfile
+      target: runner
+      args:
+        # Baked into the Next.js bundle at build time.
+        # Update this to your backend's public URL in production.
+        NEXT_PUBLIC_API_URL: http://localhost:4000
+    container_name: twitter-clone-ui
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - twitter-clone-network
+
+networks:
+  twitter-clone-network:
+    driver: bridge
