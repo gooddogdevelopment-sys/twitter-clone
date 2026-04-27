@@ -17,7 +17,9 @@ export type ClerkJwtPayload = Awaited<ReturnType<typeof verifyToken>>;
 export const CurrentUser = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): ClerkJwtPayload => {
     const gqlCtx = GqlExecutionContext.create(ctx);
-    const request = gqlCtx.getContext().req;
+    const request = gqlCtx.getContext<{
+      req: Request & { auth: ClerkJwtPayload };
+    }>().req;
     return request.auth;
   },
 );

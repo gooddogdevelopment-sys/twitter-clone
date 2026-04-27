@@ -12,7 +12,9 @@ import { Request } from 'express';
 export class ClerkAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const gqlCtx = GqlExecutionContext.create(context);
-    const request = gqlCtx.getContext().req as Request & { auth: unknown };
+    const request = gqlCtx.getContext<{ req: Request & { auth: unknown } }>()
+      .req;
+
     const token = this.extractBearerToken(request);
     if (!token) {
       throw new UnauthorizedException('No bearer token provided');
