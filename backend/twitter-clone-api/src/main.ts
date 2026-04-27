@@ -10,6 +10,7 @@ async function bootstrap() {
       json: true,
       colors: process.env.NODE_ENV !== 'production',
     }),
+    rawBody: true,
   });
   app.useLogger(app.get(Logger));
 

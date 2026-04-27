@@ -4,6 +4,8 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { LoggerModule } from 'nestjs-pino';
 import { PostsModule } from './posts/posts.module';
+import { UsersModule } from './users/users.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -39,6 +41,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     }),
     AuthModule,
     PostsModule,
+    UsersModule,
+    WebhooksModule,
   ],
   controllers: [AppController],
   providers: [AppService],
