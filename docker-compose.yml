@@ -7,6 +7,8 @@ services:
       target: production
     container_name: twitter-clone-api
     restart: unless-stopped
+    env_file:
+      - ./backend/twitter-clone-api/.env
     environment:
       NODE_ENV: production
       PORT: 3000
