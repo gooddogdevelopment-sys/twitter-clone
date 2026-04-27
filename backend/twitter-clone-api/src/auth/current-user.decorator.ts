@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import type { verifyToken } from '@clerk/backend';
-import { Request } from 'express';
 
 // Derive the payload type from the return type of verifyToken rather than
 // importing JwtPayload directly from @clerk/types.
@@ -11,12 +11,13 @@ export type ClerkJwtPayload = Awaited<ReturnType<typeof verifyToken>>;
  *
  * Usage (on a protected route):
  *   @UseGuards(ClerkAuthGuard)
- *   @Get('me')
- *   getMe(@CurrentUser() user: ClerkJwtPayload) { ... }
+ *   @Mutation(() => Post)
+ *   createPost(@CurrentUser() user: ClerkJwtPayload) { ... }
  */
 export const CurrentUser = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): ClerkJwtPayload => {
-    const request = ctx.switchToHttp().getRequest<Request>();
-    return (request as Request & { auth: ClerkJwtPayload }).auth;
+    const gqlCtx = GqlExecutionContext.create(ctx);
+    const request = gqlCtx.getContext().req;
+    return request.auth;
   },
 );

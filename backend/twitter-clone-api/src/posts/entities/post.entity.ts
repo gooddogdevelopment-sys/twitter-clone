@@ -4,7 +4,10 @@ import {
   PrimaryGeneratedColumn,
   Column,
   CreateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
 
 @ObjectType()
 @Entity()
@@ -22,4 +25,13 @@ export class Post {
 
   @Column({ default: false })
   isDeleted: boolean;
+
+  @Field(() => User)
+  @ManyToOne(() => User, (user) => user.posts)
+  @JoinColumn({ name: 'userId' })
+  user: User;
+
+  @Field()
+  @Column()
+  userId: string;
 }

@@ -4,13 +4,15 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { verifyToken } from '@clerk/backend';
 import { Request } from 'express';
 
 @Injectable()
 export class ClerkAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<Request>();
+    const gqlCtx = GqlExecutionContext.create(context);
+    const request = gqlCtx.getContext().req as Request & { auth: unknown };
     const token = this.extractBearerToken(request);
     if (!token) {
       throw new UnauthorizedException('No bearer token provided');
@@ -21,7 +23,7 @@ export class ClerkAuthGuard implements CanActivate {
         secretKey: process.env.CLERK_SECRET_KEY,
       });
       // Attach the verified payload to the request so controllers can access it
-      (request as Request & { auth: typeof payload }).auth = payload;
+      request.auth = payload;
       return true;
     } catch {
       throw new UnauthorizedException('Invalid or expired token');

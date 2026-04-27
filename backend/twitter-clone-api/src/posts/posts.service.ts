@@ -4,15 +4,24 @@ import { UpdatePostInput } from './dto/update-post.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
 import { Repository } from 'typeorm';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
+    private readonly usersService: UsersService,
   ) {}
-  create(createPostInput: CreatePostInput) {
-    const post = this.postsRepository.create(createPostInput);
+
+  async create(createPostInput: CreatePostInput, clerkId: string) {
+    const user = await this.usersService.findByClerkId(clerkId);
+    if (!user) throw new NotFoundException('User not found');
+
+    const post = this.postsRepository.create({
+      ...createPostInput,
+      userId: user.id,
+    });
     return this.postsRepository.save(post);
   }
 
