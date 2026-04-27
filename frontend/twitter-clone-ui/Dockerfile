@@ -18,10 +18,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# NEXT_PUBLIC_* vars must be set at build time if you reference them in code.
-# Pass them with: --build-arg NEXT_PUBLIC_API_URL=http://...
-ARG NEXT_PUBLIC_API_URL=http://localhost:4000
-ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+COPY .env* ./
 
 RUN pnpm build
 

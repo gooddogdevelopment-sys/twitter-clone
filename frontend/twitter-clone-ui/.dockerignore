@@ -5,3 +5,5 @@ node_modules
 *.md
 Dockerfile
 .dockerignore
+.env.local
+.env.*.local
