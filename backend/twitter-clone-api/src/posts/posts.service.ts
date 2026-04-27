@@ -25,12 +25,16 @@ export class PostsService {
     return this.postsRepository.save(post);
   }
 
-  findAll() {
-    return this.postsRepository.find();
+  async findAll(clerkId: string) {
+    const user = await this.usersService.findByClerkId(clerkId);
+    if (!user) throw new NotFoundException('User not found');
+    return this.postsRepository.findBy({ userId: user.id });
   }
 
-  findOne(id: number) {
-    return this.postsRepository.findOneBy({ id });
+  async findOne(id: number, clerkId: string) {
+    const user = await this.usersService.findByClerkId(clerkId);
+    if (!user) throw new NotFoundException('User not found');
+    return this.postsRepository.findOneBy({ id, userId: user.id });
   }
 
   async update(id: number, updatePostInput: UpdatePostInput) {

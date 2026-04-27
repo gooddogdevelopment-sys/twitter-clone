@@ -22,13 +22,16 @@ export class PostsResolver {
   }
 
   @Query(() => [Post], { name: 'posts' })
-  findAll() {
-    return this.postsService.findAll();
+  findAll(@CurrentUser() currentUser: ClerkJwtPayload) {
+    return this.postsService.findAll(currentUser.sub);
   }
 
   @Query(() => Post, { name: 'post' })
-  findOne(@Args('id', { type: () => Int }) id: number) {
-    return this.postsService.findOne(id);
+  findOne(
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() currentUser: ClerkJwtPayload,
+  ) {
+    return this.postsService.findOne(id, currentUser.sub);
   }
 
   @Mutation(() => Post)
