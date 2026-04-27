@@ -9,5 +9,5 @@ export const AppDataSource = new DataSource({
   database: process.env.DB_NAME || 'twitter_clone',
   entities: [__dirname + '/**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/migrations/*{.ts,.js}'],
-  synchronize: false
+  synchronize: false,
 });
