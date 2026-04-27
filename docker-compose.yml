@@ -12,10 +12,36 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
     ports:
       - "4000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
     networks:
       - twitter-clone-network
+
+  # ── Postgres ────────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: twitter-clone-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-twitter_clone}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - twitter-clone-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # ── Frontend (Next.js) ──────────────────────────────────────────────────────
   frontend:
@@ -40,3 +66,6 @@ services:
 networks:
   twitter-clone-network:
     driver: bridge
+
+volumes:
+  postgres_data:
