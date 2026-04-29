@@ -26,6 +26,11 @@ export class PostsResolver {
     return this.postsService.findAll(currentUser.sub);
   }
 
+  @Query(() => [Post], { name: 'feed' })
+  getFeed(@CurrentUser() currentUser: ClerkJwtPayload) {
+    return this.postsService.findFeed(currentUser.sub);
+  }
+
   @Query(() => Post, { name: 'post' })
   findOne(
     @Args('id', { type: () => Int }) id: number,

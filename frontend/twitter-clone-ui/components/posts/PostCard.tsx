@@ -9,23 +9,35 @@ interface PostCardProps {
   id: number;
   content: string;
   createdAt: string;
+  /** When provided, overrides the current viewer's Clerk identity for display */
+  authorUsername?: string;
+  authorImageUrl?: string | null;
 }
 
-export default function PostCard({ content, createdAt }: PostCardProps) {
+export default function PostCard({
+  content,
+  createdAt,
+  authorUsername,
+  authorImageUrl,
+}: PostCardProps) {
   const { user } = useUser();
 
-  const displayName = user?.fullName ?? user?.username ?? 'You';
-  const handle = user?.username
-    ? `@${user.username}`
-    : user?.primaryEmailAddress?.emailAddress?.split('@')[0]
-      ? `@${user.primaryEmailAddress.emailAddress.split('@')[0]}`
-      : null;
+  // If caller supplies an author, use it; otherwise fall back to the signed-in user
+  const displayName = authorUsername ?? user?.fullName ?? user?.username ?? 'You';
+  const handle = authorUsername
+    ? `@${authorUsername}`
+    : user?.username
+      ? `@${user.username}`
+      : user?.primaryEmailAddress?.emailAddress?.split('@')[0]
+        ? `@${user.primaryEmailAddress.emailAddress.split('@')[0]}`
+        : null;
+  const imageUrl = authorImageUrl !== undefined ? authorImageUrl : user?.imageUrl;
 
   return (
     <article className="flex gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer">
       {/* Avatar */}
       <div className="flex-shrink-0">
-        <UserAvatar imageUrl={user?.imageUrl} displayName={displayName} />
+        <UserAvatar imageUrl={imageUrl} displayName={displayName} />
       </div>
 
       {/* Body */}

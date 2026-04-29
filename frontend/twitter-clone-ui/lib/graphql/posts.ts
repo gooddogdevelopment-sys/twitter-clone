@@ -11,6 +11,20 @@ export const GET_POSTS_BY_USER = gql`
   }
 `;
 
+export const GET_FEED = gql`
+  query GetFeed {
+    feed {
+      id
+      content
+      createdAt
+      user {
+        id
+        username
+      }
+    }
+  }
+`;
+
 export const GET_POSTS = graphql(`
   query GetPosts {
     posts {

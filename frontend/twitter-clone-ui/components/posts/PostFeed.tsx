@@ -1,13 +1,24 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { GET_POSTS } from '@/lib/graphql/posts';
+import { GET_FEED } from '@/lib/graphql/posts';
 import PostCard from './PostCard';
 
+interface FeedPost {
+  id: number;
+  content: string;
+  createdAt: string;
+  user: {
+    id: string;
+    username: string;
+  };
+}
+
 export default function PostFeed() {
-  const { data, loading, error, refetch } = useQuery(GET_POSTS, {
-    fetchPolicy: 'cache-and-network',
-  });
+  const { data, loading, error, refetch } = useQuery<{ feed: FeedPost[] }>(
+    GET_FEED,
+    { fetchPolicy: 'cache-and-network' },
+  );
 
   if (loading && !data) {
     return <PostFeedSkeleton />;
@@ -17,7 +28,7 @@ export default function PostFeed() {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
         <p className="text-zinc-500 dark:text-zinc-400">
-          Something went wrong loading your posts.
+          Something went wrong loading your feed.
         </p>
         <button
           onClick={() => refetch()}
@@ -29,18 +40,16 @@ export default function PostFeed() {
     );
   }
 
-  const posts = [...(data?.posts ?? [])].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  );
+  const posts = data?.feed ?? [];
 
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
         <p className="text-zinc-900 dark:text-zinc-100 font-bold text-xl">
-          Nothing here yet
+          Your feed is empty
         </p>
         <p className="text-zinc-500 dark:text-zinc-400 mt-1 text-sm">
-          Write your first post above!
+          Write your first post, or follow someone to see their posts here.
         </p>
       </div>
     );
@@ -54,6 +63,8 @@ export default function PostFeed() {
           id={post.id}
           content={post.content}
           createdAt={post.createdAt}
+          authorUsername={post.user.username}
+          authorImageUrl={null}
         />
       ))}
     </div>
