@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 
 @Injectable()
@@ -24,5 +24,13 @@ export class UsersService {
 
   async findById(id: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { id } });
+  }
+
+  async searchByUsername(query: string): Promise<User[]> {
+    if (!query || query.trim().length === 0) return [];
+    return this.usersRepository.find({
+      where: { username: ILike(`%${query.trim()}%`) },
+      take: 20,
+    });
   }
 }
