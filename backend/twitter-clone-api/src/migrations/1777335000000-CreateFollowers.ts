@@ -32,8 +32,12 @@ export class CreateFollowers1777335000000 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "follower" DROP CONSTRAINT "FK_follower_followerUserId"`);
-    await queryRunner.query(`ALTER TABLE "follower" DROP CONSTRAINT "FK_follower_userId"`);
+    await queryRunner.query(
+      `ALTER TABLE "follower" DROP CONSTRAINT "FK_follower_followerUserId"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "follower" DROP CONSTRAINT "FK_follower_userId"`,
+    );
     await queryRunner.query(`DROP TABLE "follower"`);
   }
 }

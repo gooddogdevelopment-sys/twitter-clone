@@ -16,9 +16,12 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Field()
   @Column({ type: 'varchar', nullable: false, unique: true })
   clerkId: string;
+
+  @Field()
+  @Column({ nullable: false, unique: true })
+  username: string;
 
   @Field()
   @CreateDateColumn()
