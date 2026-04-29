@@ -3,8 +3,8 @@
 import { useState, useRef } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useMutation } from '@apollo/client';
-import Image from 'next/image';
 import { CREATE_POST, GET_POSTS } from '@/lib/graphql/posts';
+import UserAvatar from '@/components/ui/UserAvatar';
 
 const MAX_CHARS = 280;
 
@@ -72,17 +72,10 @@ export default function PostComposer({ onPostCreated }: PostComposerProps) {
     <div className="flex gap-3 px-4 pt-4 pb-2 border-b border-zinc-200 dark:border-zinc-800">
       {/* Avatar */}
       <div className="flex-shrink-0 pt-1">
-        {user?.imageUrl ? (
-          <Image
-            src={user.imageUrl}
-            alt={user.fullName ?? 'Your avatar'}
-            width={40}
-            height={40}
-            className="rounded-full w-10 h-10 object-cover"
-          />
-        ) : (
-          <div className="w-10 h-10 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-        )}
+        <UserAvatar
+          imageUrl={user?.imageUrl}
+          displayName={user?.fullName ?? user?.username}
+        />
       </div>
 
       {/* Input area */}

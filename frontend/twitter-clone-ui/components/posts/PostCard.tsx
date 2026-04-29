@@ -1,9 +1,9 @@
 'use client';
 
-import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
 import { MessageCircle, Repeat2, Heart, Share } from 'lucide-react';
 import { formatRelativeTime } from '@/lib/utils/time';
+import UserAvatar from '@/components/ui/UserAvatar';
 
 interface PostCardProps {
   id: number;
@@ -25,17 +25,7 @@ export default function PostCard({ content, createdAt }: PostCardProps) {
     <article className="flex gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer">
       {/* Avatar */}
       <div className="flex-shrink-0">
-        {user?.imageUrl ? (
-          <Image
-            src={user.imageUrl}
-            alt={displayName}
-            width={40}
-            height={40}
-            className="rounded-full w-10 h-10 object-cover"
-          />
-        ) : (
-          <div className="w-10 h-10 rounded-full bg-zinc-300 dark:bg-zinc-700" />
-        )}
+        <UserAvatar imageUrl={user?.imageUrl} displayName={displayName} />
       </div>
 
       {/* Body */}
