@@ -46,4 +46,11 @@ export class PostsService {
   async remove(id: number): Promise<void> {
     await this.postsRepository.delete(id);
   }
+
+  async findByUserId(userId: string): Promise<Post[]> {
+    return this.postsRepository.find({
+      where: { userId },
+      order: { createdAt: 'DESC' },
+    });
+  }
 }

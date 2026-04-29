@@ -39,6 +39,11 @@ export class PostsResolver {
     return this.postsService.update(updatePostInput.id, updatePostInput);
   }
 
+  @Query(() => [Post], { name: 'postsByUser' })
+  postsByUser(@Args('userId') userId: string) {
+    return this.postsService.findByUserId(userId);
+  }
+
   @Mutation(() => Post)
   removePost(@Args('id', { type: () => Int }) id: number) {
     return this.postsService.remove(id);

@@ -1,4 +1,15 @@
 import { graphql } from '../gql';
+import { gql } from '@apollo/client';
+
+export const GET_POSTS_BY_USER = gql`
+  query GetPostsByUser($userId: String!) {
+    postsByUser(userId: $userId) {
+      id
+      content
+      createdAt
+    }
+  }
+`;
 
 export const GET_POSTS = graphql(`
   query GetPosts {
