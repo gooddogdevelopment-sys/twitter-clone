@@ -9,7 +9,6 @@ interface UserAvatarProps {
   size?: number;
 }
 
-/** Picks a stable background color based on the display name. */
 function getAvatarColor(name: string): string {
   const colors = [
     'bg-sky-500',
