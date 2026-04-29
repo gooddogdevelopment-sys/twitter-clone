@@ -31,6 +31,14 @@ export class FollowersResolver {
     return this.followersService.unfollow(userIdToUnfollow, currentUser.sub);
   }
 
+  @Query(() => Boolean, { name: 'isFollowing' })
+  isFollowing(
+    @Args('userId') userId: string,
+    @CurrentUser() currentUser: ClerkJwtPayload,
+  ) {
+    return this.followersService.isFollowing(userId, currentUser.sub);
+  }
+
   @Query(() => [Follower], { name: 'followers' })
   getFollowers(@Args('userId') userId: string) {
     return this.followersService.getFollowers(userId);

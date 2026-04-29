@@ -63,4 +63,13 @@ export class FollowersService {
       relations: ['user'],
     });
   }
+
+  async isFollowing(targetUserId: string, clerkId: string): Promise<boolean> {
+    const currentUser = await this.usersService.findByClerkId(clerkId);
+    if (!currentUser) return false;
+    const record = await this.followersRepository.findOne({
+      where: { userId: targetUserId, followerUserId: currentUser.id },
+    });
+    return record !== null;
+  }
 }
