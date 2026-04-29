@@ -6,6 +6,7 @@ export const GET_POSTS = graphql(`
       id
       content
       userId
+      createdAt
     }
   }
 `);
@@ -16,6 +17,7 @@ export const CREATE_POST = graphql(`
       id
       content
       userId
+      createdAt
     }
   }
 `);

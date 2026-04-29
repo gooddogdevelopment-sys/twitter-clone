@@ -1,4 +1,4 @@
-import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { ObjectType, Field, Int, GraphQLISODateTime } from '@nestjs/graphql';
 import {
   Entity,
   PrimaryGeneratedColumn,
@@ -20,6 +20,7 @@ export class Post {
   @Column('text')
   content: string;
 
+  @Field(() => GraphQLISODateTime)
   @CreateDateColumn()
   createdAt: Date;
 

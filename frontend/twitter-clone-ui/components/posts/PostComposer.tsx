@@ -4,7 +4,7 @@ import { useState, useRef } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useMutation } from '@apollo/client';
 import Image from 'next/image';
-import { CREATE_POST } from '@/lib/graphql/posts';
+import { CREATE_POST, GET_POSTS } from '@/lib/graphql/posts';
 
 const MAX_CHARS = 280;
 
@@ -18,7 +18,9 @@ export default function PostComposer({ onPostCreated }: PostComposerProps) {
   const [error, setError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const [createPost, { loading }] = useMutation(CREATE_POST);
+  const [createPost, { loading }] = useMutation(CREATE_POST, {
+    refetchQueries: [{ query: GET_POSTS }],
+  });
 
   const remaining = MAX_CHARS - content.length;
   const isOverLimit = remaining < 0;

@@ -1,0 +1,84 @@
+'use client';
+
+import { useQuery } from '@apollo/client';
+import { GET_POSTS } from '@/lib/graphql/posts';
+import PostCard from './PostCard';
+
+export default function PostFeed() {
+  const { data, loading, error, refetch } = useQuery(GET_POSTS, {
+    fetchPolicy: 'cache-and-network',
+  });
+
+  if (loading && !data) {
+    return <PostFeedSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+        <p className="text-zinc-500 dark:text-zinc-400">
+          Something went wrong loading your posts.
+        </p>
+        <button
+          onClick={() => refetch()}
+          className="mt-3 text-sky-500 hover:underline text-sm"
+        >
+          Try again
+        </button>
+      </div>
+    );
+  }
+
+  const posts = [...(data?.posts ?? [])].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+
+  if (posts.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+        <p className="text-zinc-900 dark:text-zinc-100 font-bold text-xl">
+          Nothing here yet
+        </p>
+        <p className="text-zinc-500 dark:text-zinc-400 mt-1 text-sm">
+          Write your first post above!
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      {posts.map((post) => (
+        <PostCard
+          key={post.id}
+          id={post.id}
+          content={post.content}
+          createdAt={post.createdAt}
+        />
+      ))}
+    </div>
+  );
+}
+
+function PostFeedSkeleton() {
+  return (
+    <div>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div
+          key={i}
+          className="flex gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 animate-pulse"
+        >
+          <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 flex-shrink-0" />
+          <div className="flex-1 space-y-2 pt-1">
+            <div className="flex gap-2">
+              <div className="h-3.5 bg-zinc-200 dark:bg-zinc-800 rounded w-24" />
+              <div className="h-3.5 bg-zinc-200 dark:bg-zinc-800 rounded w-16" />
+            </div>
+            <div className="h-3.5 bg-zinc-200 dark:bg-zinc-800 rounded w-full" />
+            <div className="h-3.5 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
