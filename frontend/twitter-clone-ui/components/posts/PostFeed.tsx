@@ -8,6 +8,7 @@ interface FeedPost {
   id: number;
   content: string;
   createdAt: string;
+  likesCount: number;
   user: {
     id: string;
     username: string;
@@ -63,6 +64,7 @@ export default function PostFeed() {
           id={post.id}
           content={post.content}
           createdAt={post.createdAt}
+          likesCount={post.likesCount}
           authorUsername={post.user.username}
           authorImageUrl={null}
         />

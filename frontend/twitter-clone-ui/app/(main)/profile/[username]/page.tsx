@@ -8,13 +8,14 @@ import { GET_POSTS_BY_USER } from '@/lib/graphql/posts';
 import { IS_FOLLOWING, FOLLOW_USER, UNFOLLOW_USER } from '@/lib/graphql/followers';
 import UserAvatar from '@/components/ui/UserAvatar';
 import { formatRelativeTime } from '@/lib/utils/time';
-import { ArrowLeft, CalendarDays } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Heart } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Post {
   id: number;
   content: string;
   createdAt: string;
+  likesCount: number;
 }
 
 interface UserProfile {
@@ -263,6 +264,12 @@ export default function ProfilePage({
                   <p className="text-zinc-900 dark:text-zinc-100 text-sm leading-relaxed mt-0.5 whitespace-pre-wrap break-words">
                     {post.content}
                   </p>
+                  {post.likesCount > 0 && (
+                    <div className="flex items-center gap-1 mt-2 text-zinc-500 text-xs">
+                      <Heart size={14} strokeWidth={1.75} />
+                      <span>{post.likesCount}</span>
+                    </div>
+                  )}
                 </div>
               </article>
             ))}

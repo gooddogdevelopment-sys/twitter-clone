@@ -1,4 +1,12 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import {
+  Resolver,
+  Query,
+  Mutation,
+  Args,
+  Int,
+  ResolveField,
+  Parent,
+} from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { Post } from './entities/post.entity';
@@ -7,11 +15,20 @@ import { UpdatePostInput } from './dto/update-post.input';
 import { ClerkAuthGuard } from '../auth/clerk.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import type { ClerkJwtPayload } from '../auth/current-user.decorator';
+import { LikesService } from '../likes/likes.service';
 
 @UseGuards(ClerkAuthGuard)
 @Resolver(() => Post)
 export class PostsResolver {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly likesService: LikesService,
+  ) {}
+
+  @ResolveField(() => Int)
+  likesCount(@Parent() post: Post): Promise<number> {
+    return this.likesService.countLikes(post.id);
+  }
 
   @Mutation(() => Post)
   createPost(

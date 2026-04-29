@@ -7,6 +7,7 @@ import { PostsModule } from './posts/posts.module';
 import { UsersModule } from './users/users.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { FollowersModule } from './followers/followers.module';
+import { LikesModule } from './likes/likes.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -45,6 +46,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     UsersModule,
     WebhooksModule,
     FollowersModule,
+    LikesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

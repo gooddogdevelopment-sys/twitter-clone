@@ -1,26 +1,45 @@
 'use client';
 
+import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
+import { useMutation } from '@apollo/client';
 import { MessageCircle, Repeat2, Heart, Share } from 'lucide-react';
 import { formatRelativeTime } from '@/lib/utils/time';
 import UserAvatar from '@/components/ui/UserAvatar';
+import { LIKE_POST } from '@/lib/graphql/likes';
+import { GET_FEED } from '@/lib/graphql/posts';
 
 interface PostCardProps {
   id: number;
   content: string;
   createdAt: string;
+  likesCount?: number;
   /** When provided, overrides the current viewer's Clerk identity for display */
   authorUsername?: string;
   authorImageUrl?: string | null;
 }
 
 export default function PostCard({
+  id,
   content,
   createdAt,
+  likesCount = 0,
   authorUsername,
   authorImageUrl,
 }: PostCardProps) {
   const { user } = useUser();
+  const [optimisticCount, setOptimisticCount] = useState(likesCount);
+  const [liked, setLiked] = useState(false);
+
+  const [likePost, { loading: liking }] = useMutation(LIKE_POST, {
+    variables: { postId: id },
+    onCompleted(data) {
+      const isActive: boolean = data.likePost.isActive;
+      setLiked(isActive);
+      setOptimisticCount((c) => isActive ? c + 1 : Math.max(0, c - 1));
+    },
+    refetchQueries: [{ query: GET_FEED }],
+  });
 
   // If caller supplies an author, use it; otherwise fall back to the signed-in user
   const displayName = authorUsername ?? user?.fullName ?? user?.username ?? 'You';
@@ -69,7 +88,25 @@ export default function PostCard({
         <div className="flex items-center justify-between mt-3 text-zinc-500 max-w-[300px] -ml-2">
           <ActionButton icon={MessageCircle} label="Reply" />
           <ActionButton icon={Repeat2} label="Repost" />
-          <ActionButton icon={Heart} label="Like" />
+          <button
+            aria-label="Like"
+            disabled={liking}
+            onClick={() => likePost()}
+            className={`flex items-center gap-1.5 p-2 rounded-full transition-colors
+              ${liked
+                ? 'text-pink-500 dark:text-pink-400'
+                : 'hover:bg-pink-100 hover:text-pink-500 dark:hover:bg-pink-900/30 dark:hover:text-pink-400'
+              }`}
+          >
+            <Heart
+              size={18}
+              strokeWidth={1.75}
+              fill={liked ? 'currentColor' : 'none'}
+            />
+            {optimisticCount > 0 && (
+              <span className="text-xs">{optimisticCount}</span>
+            )}
+          </button>
           <ActionButton icon={Share} label="Share" />
         </div>
       </div>

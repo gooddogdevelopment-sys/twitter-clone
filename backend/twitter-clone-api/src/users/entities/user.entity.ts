@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { Post } from '../../posts/entities/post.entity';
 import { Follower } from '../../followers/entites/followers.entity';
+import { Likes } from '../../likes/entities/likes.entity';
 
 @ObjectType()
 @Entity()
@@ -38,4 +39,7 @@ export class User {
   @Field(() => [Follower], { nullable: true })
   @OneToMany(() => Follower, (follower) => follower.follower)
   following: Follower[]; // users this user follows
+
+  @OneToMany(() => Likes, (like) => like.post)
+  likes: Likes[];
 }
