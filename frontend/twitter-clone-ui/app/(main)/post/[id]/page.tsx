@@ -91,7 +91,7 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
         onSubmit={handleSubmit}
         className="flex gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800"
       >
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <UserAvatar
             imageUrl={user?.imageUrl}
             displayName={user?.username ?? 'You'}
@@ -108,7 +108,7 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
           <button
             type="submit"
             disabled={!commentText.trim() || submitting}
-            className="flex items-center justify-center w-8 h-8 rounded-full bg-sky-500 hover:bg-sky-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-sky-500 hover:bg-sky-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shrink-0"
           >
             <Send size={14} className="text-white" />
           </button>
@@ -120,7 +120,7 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
         <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="flex gap-3 px-4 py-3 animate-pulse">
-              <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 flex-shrink-0" />
+              <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 shrink-0" />
               <div className="flex-1 space-y-2 pt-1">
                 <div className="h-3 bg-zinc-200 dark:bg-zinc-800 rounded w-24" />
                 <div className="h-3 bg-zinc-200 dark:bg-zinc-800 rounded w-full" />
@@ -134,12 +134,12 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
         </div>
       ) : (
         <div>
-          {comments.map((comment: any) => (
+          {comments.map((comment: { id: number; content: string; createdAt: string; user?: { username: string } }) => (
             <div
               key={comment.id}
               className="flex gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800"
             >
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <UserAvatar
                   imageUrl={null}
                   displayName={comment.user?.username ?? 'User'}
@@ -158,7 +158,7 @@ export default function PostPage({ params }: { params: Promise<{ id: string }> }
                     {formatRelativeTime(comment.createdAt)}
                   </time>
                 </div>
-                <p className="text-zinc-900 dark:text-zinc-100 text-sm leading-relaxed mt-0.5 whitespace-pre-wrap break-words">
+                <p className="text-zinc-900 dark:text-zinc-100 text-sm leading-relaxed mt-0.5 whitespace-pre-wrap wrap-break-words">
                   {comment.content}
                 </p>
               </div>
