@@ -13,9 +13,11 @@ export class UsersService {
   ) {}
 
   async createFromClerk(clerkId: string): Promise<User> {
+    // TODO: Add input validation — reject empty/null clerkId before hitting the DB so invalid inputs throw a descriptive error rather than a raw DB constraint violation
     this.logger.log(`Creating user for Clerk ID: ${clerkId}`);
     const user = this.usersRepository.create({ clerkId });
     return this.usersRepository.save(user);
+    //TODO: Check if a user already exists with an id and handle error correctly
   }
 
   async findByClerkId(clerkId: string): Promise<User | null> {
