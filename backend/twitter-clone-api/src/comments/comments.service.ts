@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
 import { Repository } from 'typeorm';
@@ -12,7 +16,11 @@ export class CommentsService {
     private readonly usersService: UsersService,
   ) {}
 
-  async createComment(postId: number, content: string, clerkId: string): Promise<Comment> {
+  async createComment(
+    postId: number,
+    content: string,
+    clerkId: string,
+  ): Promise<Comment> {
     const user = await this.usersService.findByClerkId(clerkId);
     if (!user) throw new NotFoundException('User not found');
 
@@ -21,7 +29,9 @@ export class CommentsService {
       userId: user.id,
       content,
     });
-    return this.commentsRepository.save(comment);
+    const saved = await this.commentsRepository.save(comment);
+    saved.user = user;
+    return saved;
   }
 
   async deleteComment(id: number, clerkId: string): Promise<boolean> {
@@ -30,7 +40,8 @@ export class CommentsService {
 
     const comment = await this.commentsRepository.findOneBy({ id });
     if (!comment) throw new NotFoundException('Comment not found');
-    if (comment.userId !== user.id) throw new ForbiddenException('Not your comment');
+    if (comment.userId !== user.id)
+      throw new ForbiddenException('Not your comment');
 
     await this.commentsRepository.delete(id);
     return true;
