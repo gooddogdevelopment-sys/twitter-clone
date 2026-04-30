@@ -18,6 +18,7 @@ interface PostCardProps {
   isLikedByCurrentUser?: boolean;
   repostsCount?: number;
   isRepostedByCurrentUser?: boolean;
+  repostedByUsername?: string | null;
   /** When provided, overrides the current viewer's Clerk identity for display */
   authorUsername?: string;
   authorImageUrl?: string | null;
@@ -31,6 +32,7 @@ export default function PostCard({
   isLikedByCurrentUser = false,
     repostsCount = 0,
     isRepostedByCurrentUser = false,
+    repostedByUsername,
   authorUsername,
   authorImageUrl,
 }: PostCardProps) {
@@ -73,7 +75,14 @@ export default function PostCard({
   const imageUrl = authorImageUrl !== undefined ? authorImageUrl : user?.imageUrl;
 
   return (
-    <article className="flex gap-3 px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer">
+    <article className="border-b border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors cursor-pointer">
+      {repostedByUsername && (
+        <div className="flex items-center gap-1.5 px-4 pt-2 text-xs text-zinc-500 dark:text-zinc-400">
+          <Repeat2 size={13} strokeWidth={2} />
+          <span>{repostedByUsername} reposted</span>
+        </div>
+      )}
+      <div className="flex gap-3 px-4 py-3">
       {/* Avatar */}
       <div className="flex-shrink-0">
         <UserAvatar imageUrl={imageUrl} displayName={displayName} />
@@ -144,8 +153,9 @@ export default function PostCard({
               <span className="text-xs">{optimisticLikeCount}</span>
             )}
           </button>
-          <ActionButton icon={Share} label="Share" />
+          {/*<ActionButton icon={Share} label="Share" />*/}
         </div>
+      </div>
       </div>
     </article>
   );

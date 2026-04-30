@@ -6,6 +6,7 @@ import { Post } from './entities/post.entity';
 import { In, Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 import { Follower } from '../followers/entites/followers.entity';
+import { Reposts } from '../repost/entities/reposts.entity';
 
 @Injectable()
 export class PostsService {
@@ -14,6 +15,8 @@ export class PostsService {
     private readonly postsRepository: Repository<Post>,
     @InjectRepository(Follower)
     private readonly followersRepository: Repository<Follower>,
+    @InjectRepository(Reposts)
+    private readonly repostsRepository: Repository<Reposts>,
     private readonly usersService: UsersService,
   ) {}
 
@@ -61,20 +64,42 @@ export class PostsService {
     const currentUser = await this.usersService.findByClerkId(clerkId);
     if (!currentUser) throw new NotFoundException('User not found');
 
-    // Collect IDs of all users the current user follows
     const following = await this.followersRepository.find({
       where: { followerUserId: currentUser.id },
       select: ['userId'],
     });
     const followedIds = following.map((f) => f.userId);
-
-    // Include the current user's own posts in their feed
     const authorIds = [currentUser.id, ...followedIds];
 
-    return this.postsRepository.find({
+    // Posts authored by followed users + self
+    const authoredPosts = await this.postsRepository.find({
       where: { userId: In(authorIds) },
       relations: ['user'],
       order: { createdAt: 'DESC' },
     });
+    const seenIds = new Set(authoredPosts.map((p) => p.id));
+
+    // Active reposts by followed users + self, with reposter's user info
+    const reposts = await this.repostsRepository.find({
+      where: { userId: In(authorIds), isActive: true },
+      relations: ['post', 'post.user', 'user'],
+    });
+
+    // Add reposted posts not already in the authored set
+    const repostedPosts: Post[] = [];
+    for (const repost of reposts) {
+      if (!seenIds.has(repost.postId)) {
+        const post = repost.post as Post;
+        post.repostedByUsername = repost.user.username;
+        repostedPosts.push(post);
+        seenIds.add(repost.postId);
+      }
+    }
+
+    const allPosts = [...authoredPosts, ...repostedPosts];
+    allPosts.sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
+    return allPosts;
   }
 }

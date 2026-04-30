@@ -52,4 +52,13 @@ export class Post {
 
   @OneToMany(() => Reposts, (repost) => repost.post)
   reposts: Reposts[];
+
+  @Field(() => String, { nullable: true })
+  repostedByUsername?: string;
+
+  @Field(() => Int, { nullable: true })
+  repostsCount: number;
+
+  @Field({ nullable: true })
+  isRepostedByCurrentUser: boolean;
 }

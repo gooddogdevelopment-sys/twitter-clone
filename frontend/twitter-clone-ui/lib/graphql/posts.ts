@@ -23,6 +23,7 @@ export const GET_FEED = gql`
       isLikedByCurrentUser
       repostsCount
       isRepostedByCurrentUser
+      repostedByUsername
       user {
         id
         username

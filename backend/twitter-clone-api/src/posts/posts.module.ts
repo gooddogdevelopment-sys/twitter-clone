@@ -7,10 +7,11 @@ import { UsersModule } from '../users/users.module';
 import { Follower } from '../followers/entites/followers.entity';
 import { LikesModule } from '../likes/likes.module';
 import { RepostsModule } from '../repost/reposts.module';
+import { Reposts } from '../repost/entities/reposts.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Post, Follower]),
+    TypeOrmModule.forFeature([Post, Follower, Reposts]),
     UsersModule,
     LikesModule,
     RepostsModule,
