@@ -1,27 +1,22 @@
-﻿import { Field, GraphQLISODateTime, Int, ObjectType } from '@nestjs/graphql';
+﻿import { Field, GraphQLISODateTime, Int } from '@nestjs/graphql';
 import {
   Column,
   CreateDateColumn,
-  Entity,
   Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
-  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Post } from '../../posts/entities/post.entity';
 
-@ObjectType()
-@Entity()
-@Unique(['userId', 'postId'])
-export class Likes {
-  @Field(() => Int, { description: 'Likes Id' })
+export class Reposts {
+  @Field(() => Int)
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User, (user) => user.likes, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.reposts, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 
@@ -29,7 +24,7 @@ export class Likes {
   @Field()
   userId: string;
 
-  @ManyToOne(() => Post, (post) => post.likes, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Post, (post) => post.reposts, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'postId' })
   post: Post;
 
@@ -39,7 +34,7 @@ export class Likes {
   postId: number;
 
   @Field()
-  @Column({ default: true })
+  @Column({ default: true, nullable: false })
   isActive: boolean;
 
   @Field(() => GraphQLISODateTime)

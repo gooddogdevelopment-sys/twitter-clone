@@ -5,10 +5,12 @@ import {
   Column,
   CreateDateColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
 import { Post } from '../../posts/entities/post.entity';
 import { Follower } from '../../followers/entites/followers.entity';
 import { Likes } from '../../likes/entities/likes.entity';
+import { Reposts } from '../../repost/entities/reposts.entity';
 
 @ObjectType()
 @Entity()
@@ -18,6 +20,7 @@ export class User {
   id: string;
 
   @Column({ type: 'varchar', nullable: false, unique: true })
+  @Index()
   clerkId: string;
 
   @Field()
@@ -42,4 +45,7 @@ export class User {
 
   @OneToMany(() => Likes, (like) => like.post)
   likes: Likes[];
+
+  @OneToMany(() => Reposts, (repost) => repost.user)
+  reposts: Reposts[];
 }

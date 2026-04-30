@@ -6,6 +6,7 @@ import {
   CreateDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
@@ -18,10 +19,12 @@ export class Follower {
 
   @Field()
   @Column()
+  @Index()
   userId: string; // the user being followed
 
   @Field()
   @Column()
+  @Index()
   followerUserId: string; // the user doing the following
 
   @Field()

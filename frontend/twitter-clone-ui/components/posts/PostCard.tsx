@@ -14,6 +14,7 @@ interface PostCardProps {
   content: string;
   createdAt: string;
   likesCount?: number;
+  isLikedByCurrentUser?: boolean;
   /** When provided, overrides the current viewer's Clerk identity for display */
   authorUsername?: string;
   authorImageUrl?: string | null;
@@ -24,12 +25,13 @@ export default function PostCard({
   content,
   createdAt,
   likesCount = 0,
+  isLikedByCurrentUser = false,
   authorUsername,
   authorImageUrl,
 }: PostCardProps) {
   const { user } = useUser();
   const [optimisticCount, setOptimisticCount] = useState(likesCount);
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(isLikedByCurrentUser);
 
   const [likePost, { loading: liking }] = useMutation(LIKE_POST, {
     variables: { postId: id },

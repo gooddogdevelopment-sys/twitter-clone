@@ -9,6 +9,7 @@ interface FeedPost {
   content: string;
   createdAt: string;
   likesCount: number;
+  isLikedByCurrentUser: boolean;
   user: {
     id: string;
     username: string;
@@ -65,6 +66,7 @@ export default function PostFeed() {
           content={post.content}
           createdAt={post.createdAt}
           likesCount={post.likesCount}
+          isLikedByCurrentUser={post.isLikedByCurrentUser}
           authorUsername={post.user.username}
           authorImageUrl={null}
         />

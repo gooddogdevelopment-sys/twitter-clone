@@ -7,9 +7,11 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  Index,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Likes } from '../../likes/entities/likes.entity';
+import { Reposts } from '../../repost/entities/reposts.entity';
 
 @ObjectType()
 @Entity()
@@ -41,6 +43,13 @@ export class Post {
   likesCount: number;
 
   @Field()
+  isLikedByCurrentUser: boolean;
+
+  @Field()
   @Column()
+  @Index()
   userId: string;
+
+  @OneToMany(() => Reposts, (repost) => repost.post)
+  reposts: Reposts[];
 }

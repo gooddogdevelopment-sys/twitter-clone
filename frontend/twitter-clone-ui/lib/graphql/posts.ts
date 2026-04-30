@@ -8,6 +8,7 @@ export const GET_POSTS_BY_USER = gql`
       content
       createdAt
       likesCount
+      isLikedByCurrentUser
     }
   }
 `;
@@ -19,6 +20,7 @@ export const GET_FEED = gql`
       content
       createdAt
       likesCount
+      isLikedByCurrentUser
       user {
         id
         username

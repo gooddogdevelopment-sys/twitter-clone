@@ -6,6 +6,7 @@ import {
   Int,
   ResolveField,
   Parent,
+  Context,
 } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { PostsService } from './posts.service';
@@ -28,6 +29,14 @@ export class PostsResolver {
   @ResolveField(() => Int)
   likesCount(@Parent() post: Post): Promise<number> {
     return this.likesService.countLikes(post.id);
+  }
+
+  @ResolveField(() => Boolean)
+  isLikedByCurrentUser(
+    @Parent() post: Post,
+    @Context() ctx: { req: { auth: ClerkJwtPayload } },
+  ): Promise<boolean> {
+    return this.likesService.isLikedByCurrentUser(post.id, ctx.req.auth.sub);
   }
 
   @Mutation(() => Post)

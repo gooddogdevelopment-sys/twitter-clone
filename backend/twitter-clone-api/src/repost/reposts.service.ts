@@ -1,49 +1,50 @@
 ﻿import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Likes } from './entities/likes.entity';
+import { Reposts } from './entities/reposts.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
-export class LikesService {
+export class RepostsService {
   constructor(
-    @InjectRepository(Likes)
-    private readonly likesRepository: Repository<Likes>,
+    @InjectRepository(Reposts)
+    private readonly repostsRepository: Repository<Reposts>,
     private readonly usersService: UsersService,
   ) {}
-  async likePost(postId: number, clerkId: string): Promise<Likes> {
+  async repost(postId: number, clerkId: string): Promise<Reposts> {
     const user = await this.usersService.findByClerkId(clerkId);
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User Not Found');
     }
-    const existing = await this.likesRepository.findOne({
+    const existing = await this.repostsRepository.findOne({
       where: { postId, userId: user.id },
     });
+
     if (existing) {
       existing.isActive = !existing.isActive;
-      return this.likesRepository.save(existing);
+      return this.repostsRepository.save(existing);
     }
-    const like = this.likesRepository.create({
+    const repost = this.repostsRepository.create({
       postId,
       userId: user.id,
       isActive: true,
     });
-    return this.likesRepository.save(like);
+    return this.repostsRepository.save(repost);
   }
 
-  async countLikes(postId: number): Promise<number> {
-    return this.likesRepository.count({ where: { postId, isActive: true } });
+  async countReposts(postId: number): Promise<number> {
+    return this.repostsRepository.count({ where: { postId, isActive: true } });
   }
 
-  async isLikedByCurrentUser(
+  async isRepostedByCurrentUser(
     postId: number,
     clerkId: string,
   ): Promise<boolean> {
     const user = await this.usersService.findByClerkId(clerkId);
     if (!user) return false;
-    const like = await this.likesRepository.findOne({
+    const repost = await this.repostsRepository.findOne({
       where: { postId, userId: user.id, isActive: true },
     });
-    return !!like;
+    return !!repost;
   }
 }
