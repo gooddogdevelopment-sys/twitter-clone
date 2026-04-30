@@ -18,6 +18,7 @@ import { CurrentUser } from '../auth/current-user.decorator';
 import type { ClerkJwtPayload } from '../auth/current-user.decorator';
 import { LikesService } from '../likes/likes.service';
 import { RepostsService } from '../repost/reposts.service';
+import { CommentsService } from '../comments/comments.service';
 
 @UseGuards(ClerkAuthGuard)
 @Resolver(() => Post)
@@ -26,6 +27,7 @@ export class PostsResolver {
     private readonly postsService: PostsService,
     private readonly likesService: LikesService,
     private readonly repostsService: RepostsService,
+    private readonly commentsService: CommentsService,
   ) {}
 
   @ResolveField(() => Int)
@@ -44,6 +46,11 @@ export class PostsResolver {
   @ResolveField(() => Int)
   repostsCount(@Parent() post: Post): Promise<number> {
     return this.repostsService.countReposts(post.id);
+  }
+
+  @ResolveField(() => Int)
+  commentsCount(@Parent() post: Post): Promise<number> {
+    return this.commentsService.countComments(post.id);
   }
 
   @ResolveField(() => Boolean)

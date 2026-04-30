@@ -8,6 +8,7 @@ import { Follower } from '../followers/entites/followers.entity';
 import { LikesModule } from '../likes/likes.module';
 import { RepostsModule } from '../repost/reposts.module';
 import { Reposts } from '../repost/entities/reposts.entity';
+import { CommentsModule } from '../comments/comments.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { Reposts } from '../repost/entities/reposts.entity';
     UsersModule,
     LikesModule,
     RepostsModule,
+    CommentsModule,
   ],
   providers: [PostsResolver, PostsService],
 })

@@ -1,6 +1,25 @@
 import { graphql } from '../gql';
 import { gql } from '@apollo/client';
 
+export const GET_POST_BY_ID = gql`
+  query GetPostById($id: Int!) {
+    post(id: $id) {
+      id
+      content
+      createdAt
+      likesCount
+      isLikedByCurrentUser
+      repostsCount
+      isRepostedByCurrentUser
+      commentsCount
+      user {
+        id
+        username
+      }
+    }
+  }
+`;
+
 export const GET_POSTS_BY_USER = gql`
   query GetPostsByUser($userId: String!) {
     postsByUser(userId: $userId) {
@@ -23,6 +42,7 @@ export const GET_FEED = gql`
       isLikedByCurrentUser
       repostsCount
       isRepostedByCurrentUser
+      commentsCount
       repostedByUsername
       user {
         id

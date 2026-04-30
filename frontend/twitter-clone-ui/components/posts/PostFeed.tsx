@@ -12,6 +12,7 @@ interface FeedPost {
   isLikedByCurrentUser: boolean;
   repostsCount: number;
   isRepostedByCurrentUser: boolean;
+  commentsCount: number;
   repostedByUsername?: string | null;
   user: {
     id: string;
@@ -72,6 +73,7 @@ export default function PostFeed() {
           isLikedByCurrentUser={post.isLikedByCurrentUser}
           repostsCount={post.repostsCount}
           isRepostedByCurrentUser={post.isRepostedByCurrentUser}
+          commentsCount={post.commentsCount}
           repostedByUsername={post.repostedByUsername}
           authorUsername={post.user.username}
           authorImageUrl={null}

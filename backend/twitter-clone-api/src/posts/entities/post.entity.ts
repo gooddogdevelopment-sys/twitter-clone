@@ -12,6 +12,7 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { Likes } from '../../likes/entities/likes.entity';
 import { Reposts } from '../../repost/entities/reposts.entity';
+import { Comment } from '../../comments/entities/comment.entity';
 
 @ObjectType()
 @Entity()
@@ -52,6 +53,12 @@ export class Post {
 
   @OneToMany(() => Reposts, (repost) => repost.post)
   reposts: Reposts[];
+
+  @OneToMany(() => Comment, (comment) => comment.post)
+  comments: Comment[];
+
+  @Field(() => Int)
+  commentsCount: number;
 
   @Field(() => String, { nullable: true })
   repostedByUsername?: string;
