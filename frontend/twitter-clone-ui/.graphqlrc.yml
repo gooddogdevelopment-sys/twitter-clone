@@ -1,0 +1,6 @@
+schema: ./schema.graphql
+documents:
+  - app/**/*.{ts,tsx}
+  - components/**/*.{ts,tsx}
+  - lib/graphql/**/*.ts
+  - "!lib/gql/**/*"

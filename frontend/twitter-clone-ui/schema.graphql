@@ -1,0 +1,100 @@
+"""A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format."""
+scalar DateTime
+
+type Query {
+  commentsByPost(postId: Int!): [Comment!]!
+  feed: [Post!]!
+  followers(userId: String!): [Follower!]!
+  following(userId: String!): [Follower!]!
+  getUserByUsername(username: String!): User
+  isFollowing(userId: String!): Boolean!
+  post(id: Int!): Post!
+  posts: [Post!]!
+  postsByUser(userId: String!): [Post!]!
+  searchUsers(query: String!): [User!]!
+}
+
+type Mutation {
+  createComment(postId: Int!, content: String!): Comment!
+  createPost(createPostInput: CreatePostInput!): Post!
+  deleteComment(id: Int!): Boolean!
+  follow(createFollowerInput: CreateFollowerInput!): Follower!
+  likePost(postId: Int!): Likes!
+  removePost(id: Int!): Post!
+  repost(postId: Int!): Reposts!
+  unfollow(userIdToUnfollow: String!): Boolean!
+  updatePost(updatePostInput: UpdatePostInput!): Post!
+}
+
+type Post {
+  """Post Id"""
+  id: Int!
+  content: String!
+  userId: String!
+  createdAt: DateTime!
+  likesCount: Int!
+  isLikedByCurrentUser: Boolean!
+  repostsCount: Int!
+  isRepostedByCurrentUser: Boolean!
+  commentsCount: Int!
+  repostedByUsername: String
+  user: User!
+}
+
+type User {
+  id: String!
+  username: String!
+  createdAt: DateTime!
+  posts: [Post!]
+  followers: [Follower!]
+  following: [Follower!]
+}
+
+type Comment {
+  """Comment Id"""
+  id: Int!
+  content: String!
+  userId: String!
+  postId: Int!
+  createdAt: DateTime!
+  user: User!
+}
+
+type Follower {
+  id: Float!
+  userId: String!
+  followerUserId: String!
+  createdAt: DateTime!
+}
+
+type Likes {
+  """Likes Id"""
+  id: Int!
+  postId: Float!
+  userId: String!
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Reposts {
+  id: Int!
+  postId: Float!
+  userId: String!
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input CreatePostInput {
+  content: String!
+}
+
+input CreateFollowerInput {
+  userIdToFollow: String!
+}
+
+input UpdatePostInput {
+  id: Int!
+  content: String
+}
