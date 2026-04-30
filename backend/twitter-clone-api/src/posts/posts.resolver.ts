@@ -51,7 +51,10 @@ export class PostsResolver {
     @Parent() post: Post,
     @Context() ctx: { req: { auth: ClerkJwtPayload } },
   ): Promise<boolean> {
-    return this.repostsService.isRepostedByCurrentUser(post.id, ctx.req.auth.sub);
+    return this.repostsService.isRepostedByCurrentUser(
+      post.id,
+      ctx.req.auth.sub,
+    );
   }
 
   @Mutation(() => Post)

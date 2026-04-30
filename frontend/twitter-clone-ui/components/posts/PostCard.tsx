@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { useMutation } from '@apollo/client';
-import { MessageCircle, Repeat2, Heart, Share } from 'lucide-react';
+import { MessageCircle, Repeat2, Heart } from 'lucide-react';
 import { formatRelativeTime } from '@/lib/utils/time';
 import UserAvatar from '@/components/ui/UserAvatar';
 import { LIKE_POST } from '@/lib/graphql/likes';

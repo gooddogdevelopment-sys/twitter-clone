@@ -89,7 +89,7 @@ export class PostsService {
     const repostedPosts: Post[] = [];
     for (const repost of reposts) {
       if (!seenIds.has(repost.postId)) {
-        const post = repost.post as Post;
+        const post = repost.post;
         post.repostedByUsername = repost.user.username;
         repostedPosts.push(post);
         seenIds.add(repost.postId);
@@ -98,7 +98,8 @@ export class PostsService {
 
     const allPosts = [...authoredPosts, ...repostedPosts];
     allPosts.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
     );
     return allPosts;
   }
