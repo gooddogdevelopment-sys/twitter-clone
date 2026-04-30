@@ -8,6 +8,7 @@ import { formatRelativeTime } from '@/lib/utils/time';
 import UserAvatar from '@/components/ui/UserAvatar';
 import { LIKE_POST } from '@/lib/graphql/likes';
 import { GET_FEED } from '@/lib/graphql/posts';
+import {REPOST} from "@/lib/graphql/reposts";
 
 interface PostCardProps {
   id: number;
@@ -15,6 +16,8 @@ interface PostCardProps {
   createdAt: string;
   likesCount?: number;
   isLikedByCurrentUser?: boolean;
+  repostsCount?: number;
+  isRepostedByCurrentUser?: boolean;
   /** When provided, overrides the current viewer's Clerk identity for display */
   authorUsername?: string;
   authorImageUrl?: string | null;
@@ -26,22 +29,37 @@ export default function PostCard({
   createdAt,
   likesCount = 0,
   isLikedByCurrentUser = false,
+    repostsCount = 0,
+    isRepostedByCurrentUser = false,
   authorUsername,
   authorImageUrl,
 }: PostCardProps) {
   const { user } = useUser();
-  const [optimisticCount, setOptimisticCount] = useState(likesCount);
+  const [optimisticLikeCount, setOptimisticLikeCount] = useState(likesCount);
   const [liked, setLiked] = useState(isLikedByCurrentUser);
+
+  const [optimisticRepostCount, setOptimisticRepostCount] = useState(repostsCount);
+  const [reposted, setReposted] = useState(isRepostedByCurrentUser);
 
   const [likePost, { loading: liking }] = useMutation(LIKE_POST, {
     variables: { postId: id },
     onCompleted(data) {
       const isActive: boolean = data.likePost.isActive;
       setLiked(isActive);
-      setOptimisticCount((c) => isActive ? c + 1 : Math.max(0, c - 1));
+      setOptimisticLikeCount((c) => isActive ? c + 1 : Math.max(0, c - 1));
     },
     refetchQueries: [{ query: GET_FEED }],
   });
+
+  const [repost, {loading:reposting}] = useMutation(REPOST, {
+    variables: {postId: id},
+    onCompleted(data) {
+      const isActive: boolean = data.repost.isActive;
+      setReposted(isActive);
+      setOptimisticRepostCount((c)=> isActive ? c + 1 : Math.max(0, c - 1));
+    },
+    refetchQueries: [{ query: GET_FEED }],
+  })
 
   // If caller supplies an author, use it; otherwise fall back to the signed-in user
   const displayName = authorUsername ?? user?.fullName ?? user?.username ?? 'You';
@@ -89,7 +107,24 @@ export default function PostCard({
         {/* Action row */}
         <div className="flex items-center justify-between mt-3 text-zinc-500 max-w-[300px] -ml-2">
           <ActionButton icon={MessageCircle} label="Reply" />
-          <ActionButton icon={Repeat2} label="Repost" />
+          <button
+            aria-label="Repost"
+            disabled={reposting}
+            onClick={() => repost()}
+            className={`flex items-center gap-1.5 p-2 rounded-full transition-colors
+              ${reposted
+                ? 'text-green-500 dark:text-green-400'
+                : 'hover:bg-green-100 hover:text-green-500 dark:hover:bg-green-900/30 dark:hover:text-green-400'
+              }`}
+          >
+            <Repeat2
+              size={18}
+              strokeWidth={1.75}
+            />
+            {optimisticRepostCount > 0 && (
+              <span className="text-xs">{optimisticRepostCount}</span>
+            )}
+          </button>
           <button
             aria-label="Like"
             disabled={liking}
@@ -105,8 +140,8 @@ export default function PostCard({
               strokeWidth={1.75}
               fill={liked ? 'currentColor' : 'none'}
             />
-            {optimisticCount > 0 && (
-              <span className="text-xs">{optimisticCount}</span>
+            {optimisticLikeCount > 0 && (
+              <span className="text-xs">{optimisticLikeCount}</span>
             )}
           </button>
           <ActionButton icon={Share} label="Share" />

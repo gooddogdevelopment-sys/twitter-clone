@@ -1,16 +1,20 @@
-﻿import { Field, GraphQLISODateTime, Int } from '@nestjs/graphql';
+﻿import { Field, GraphQLISODateTime, Int, ObjectType } from '@nestjs/graphql';
 import {
   Column,
   CreateDateColumn,
+  Entity,
   Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Post } from '../../posts/entities/post.entity';
-
+@Unique(['userId', 'postId'])
+@ObjectType()
+@Entity()
 export class Reposts {
   @Field(() => Int)
   @PrimaryGeneratedColumn()
