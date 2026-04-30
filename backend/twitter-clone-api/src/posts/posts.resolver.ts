@@ -17,6 +17,7 @@ import { ClerkAuthGuard } from '../auth/clerk.guard';
 import { CurrentUser } from '../auth/current-user.decorator';
 import type { ClerkJwtPayload } from '../auth/current-user.decorator';
 import { LikesService } from '../likes/likes.service';
+import { RepostsService } from '../repost/reposts.service';
 
 @UseGuards(ClerkAuthGuard)
 @Resolver(() => Post)
@@ -24,6 +25,7 @@ export class PostsResolver {
   constructor(
     private readonly postsService: PostsService,
     private readonly likesService: LikesService,
+    private readonly repostsService: RepostsService,
   ) {}
 
   @ResolveField(() => Int)
@@ -37,6 +39,19 @@ export class PostsResolver {
     @Context() ctx: { req: { auth: ClerkJwtPayload } },
   ): Promise<boolean> {
     return this.likesService.isLikedByCurrentUser(post.id, ctx.req.auth.sub);
+  }
+
+  @ResolveField(() => Int)
+  repostsCount(@Parent() post: Post): Promise<number> {
+    return this.repostsService.countReposts(post.id);
+  }
+
+  @ResolveField(() => Boolean)
+  isRepostedByCurrentUser(
+    @Parent() post: Post,
+    @Context() ctx: { req: { auth: ClerkJwtPayload } },
+  ): Promise<boolean> {
+    return this.repostsService.isRepostedByCurrentUser(post.id, ctx.req.auth.sub);
   }
 
   @Mutation(() => Post)

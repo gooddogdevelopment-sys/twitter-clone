@@ -6,12 +6,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from '../users/users.module';
 import { Follower } from '../followers/entites/followers.entity';
 import { LikesModule } from '../likes/likes.module';
+import { RepostsModule } from '../repost/reposts.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Post, Follower]),
     UsersModule,
     LikesModule,
+    RepostsModule,
   ],
   providers: [PostsResolver, PostsService],
 })
