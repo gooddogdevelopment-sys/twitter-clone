@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { ILike } from 'typeorm';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 
@@ -26,7 +26,6 @@ const mockUsersRepository = {
 
 describe('UsersService', () => {
   let service: UsersService;
-  let usersRepository: Repository<User>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -40,7 +39,6 @@ describe('UsersService', () => {
     }).compile();
 
     service = module.get<UsersService>(UsersService);
-    usersRepository = module.get<Repository<User>>(getRepositoryToken(User));
   });
 
   afterEach(() => {
