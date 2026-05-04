@@ -75,7 +75,10 @@ describe('CommentsService', () => {
   // ---------------------------------------------------------------------------
   describe('createComment', () => {
     it('should create, save, and return a comment with the user attached', async () => {
-      const savedComment = { ...mockComment, user: undefined } as unknown as Comment;
+      const savedComment = {
+        ...mockComment,
+        user: undefined,
+      } as unknown as Comment;
       mockUsersService.findByClerkId.mockResolvedValue(mockUser);
       mockCommentsRepository.create.mockReturnValue(savedComment);
       mockCommentsRepository.save.mockResolvedValue(savedComment);
