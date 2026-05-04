@@ -55,11 +55,20 @@ services:
     plan: free
     region: ohio
     rootDir: frontend/twitter-clone-ui
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm codegen && pnpm build
+    # After the Next.js build, copy static assets and public files into the
+    # standalone directory. The standalone server runs from inside .next/standalone/
+    # and expects these folders to live alongside it — the Dockerfile does this
+    # explicitly; we replicate it here for Render's native Node runtime.
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm codegen && pnpm build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public
     startCommand: node .next/standalone/server.js
     envVars:
       - key: NODE_ENV
         value: production
+
+      # Ensures the server binds to all interfaces, not just loopback —
+      # required for Render's proxy to reach the process.
+      - key: HOSTNAME
+        value: "0.0.0.0"
 
       # ── API URL ───────────────────────────────────────────────────────────────
       # IMPORTANT: NEXT_PUBLIC_* vars are baked in at BUILD time by Next.js.
