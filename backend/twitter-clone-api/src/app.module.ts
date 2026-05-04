@@ -13,6 +13,34 @@ import { CommentsModule } from './comments/comments.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+
+function buildTypeOrmOptions(): TypeOrmModuleOptions {
+  const base: Partial<TypeOrmModuleOptions> = {
+    entities: [__dirname + '/**/*.entity{.ts,.js}'],
+    migrations: [__dirname + '/migrations/*{.ts,.js}'],
+    synchronize: false,
+  };
+
+  if (process.env.DATABASE_URL) {
+    return {
+      type: 'postgres',
+      url: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false },
+      ...base,
+    } as TypeOrmModuleOptions;
+  }
+
+  return {
+    type: 'postgres',
+    host: process.env.DB_HOST || 'localhost',
+    port: parseInt(process.env.DB_PORT as string) || 5432,
+    username: process.env.DB_USERNAME || 'postgres',
+    password: process.env.DB_PASSWORD || 'postgres',
+    database: process.env.DB_NAME || 'mydb',
+    ...base,
+  } as TypeOrmModuleOptions;
+}
 
 @Module({
   imports: [
@@ -32,17 +60,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       graphiql: true,
       introspection: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT as string) || 5432,
-      username: process.env.DB_USERNAME || 'postgres',
-      password: process.env.DB_PASSWORD || 'postgres',
-      database: process.env.DB_NAME || 'mydb',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      migrations: [__dirname + '/migrations/*{.ts,.js}'],
-      synchronize: false,
-    }),
+    TypeOrmModule.forRoot(buildTypeOrmOptions()),
     AuthModule,
     PostsModule,
     UsersModule,
