@@ -59,10 +59,14 @@ describe('UsersService', () => {
       mockUsersRepository.create.mockReturnValue({ clerkId: mockUser.clerkId });
       mockUsersRepository.save.mockResolvedValue(mockUser);
 
-      const result = await service.createFromClerk(mockUser.clerkId);
+      const result = await service.createFromClerk(
+        mockUser.clerkId,
+        mockUser.username,
+      );
 
       expect(mockUsersRepository.create).toHaveBeenCalledWith({
         clerkId: mockUser.clerkId,
+        username: mockUser.username,
       });
       expect(mockUsersRepository.save).toHaveBeenCalled();
       expect(result).toEqual(mockUser);
@@ -78,7 +82,7 @@ describe('UsersService', () => {
         new Error('violates not-null constraint'),
       );
 
-      await expect(service.createFromClerk('')).rejects.toThrow(
+      await expect(service.createFromClerk('', '')).rejects.toThrow(
         'violates not-null constraint',
       );
     });

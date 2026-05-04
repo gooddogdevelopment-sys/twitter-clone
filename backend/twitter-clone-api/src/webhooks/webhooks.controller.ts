@@ -17,6 +17,7 @@ interface ClerkUserCreatedEvent {
   type: string;
   data: {
     id: string;
+    username: string;
     [key: string]: unknown;
   };
 }
@@ -63,9 +64,10 @@ export class WebhooksController {
 
     if (event.type === 'user.created') {
       const clerkId = event.data.id;
+      const username = event.data.username;
       const existing = await this.usersService.findByClerkId(clerkId);
       if (!existing) {
-        await this.usersService.createFromClerk(clerkId);
+        await this.usersService.createFromClerk(clerkId, username);
         this.logger.log(`User created in database for Clerk ID: ${clerkId}`);
       } else {
         this.logger.warn(
