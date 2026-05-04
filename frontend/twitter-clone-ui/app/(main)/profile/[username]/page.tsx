@@ -5,7 +5,7 @@ import { useQuery, useMutation } from '@apollo/client';
 import { useUser } from '@clerk/nextjs';
 import { GET_USER_BY_USERNAME } from '@/lib/graphql/users';
 import { GET_POSTS_BY_USER } from '@/lib/graphql/posts';
-import { IS_FOLLOWING, FOLLOW_USER, UNFOLLOW_USER } from '@/lib/graphql/followers';
+import { IS_FOLLOWING, FOLLOW_USER, UNFOLLOW_USER, GET_FOLLOWERS, GET_FOLLOWING } from '@/lib/graphql/followers';
 import UserAvatar from '@/components/ui/UserAvatar';
 import { formatRelativeTime } from '@/lib/utils/time';
 import { ArrowLeft, CalendarDays, Heart } from 'lucide-react';
@@ -80,6 +80,18 @@ export default function ProfilePage({
   });
 
   const isMutating = followMutating || unfollowMutating;
+
+  // Follower / following counts
+  const { data: followersData } = useQuery<{ followers: { id: string }[] }>(
+    GET_FOLLOWERS,
+    { variables: { userId: user?.id }, skip: !user?.id },
+  );
+  const { data: followingData } = useQuery<{ following: { id: string }[] }>(
+    GET_FOLLOWING,
+    { variables: { userId: user?.id }, skip: !user?.id },
+  );
+  const followersCount = followersData?.followers?.length ?? null;
+  const followingCount = followingData?.following?.length ?? null;
 
   // Posts
   const { data: postsData, loading: postsLoading } = useQuery<{
@@ -196,6 +208,22 @@ export default function ProfilePage({
                   <div className="flex items-center gap-1 mt-2 text-zinc-500 dark:text-zinc-400 text-sm">
                     <CalendarDays className="w-4 h-4" />
                     <span>Member of the flock</span>
+                  </div>
+                  <div className="flex items-center gap-4 mt-3 text-sm">
+                    <span>
+                      <span className="font-bold text-zinc-900 dark:text-zinc-100">
+                        {followingCount ?? '—'}
+                      </span>{' '}
+                      <span className="text-zinc-500 dark:text-zinc-400">Following</span>
+                    </span>
+                    <span>
+                      <span className="font-bold text-zinc-900 dark:text-zinc-100">
+                        {followersCount ?? '—'}
+                      </span>{' '}
+                      <span className="text-zinc-500 dark:text-zinc-400">
+                        {followersCount === 1 ? 'Follower' : 'Followers'}
+                      </span>
+                    </span>
                   </div>
                 </div>
               )
