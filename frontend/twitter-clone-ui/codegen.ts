@@ -1,9 +1,10 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
-  // Pull the schema from the running backend via introspection.
-  // Make sure the backend is running before executing `pnpm codegen`.
-  schema: 'http://localhost:4000/graphql',
+  // Use the committed schema file so codegen works without a running backend
+  // (required for CI/CD environments like Render).
+  // To regenerate after schema changes: update schema.graphql first, then run `pnpm codegen`.
+  schema: './schema.graphql',
 
   // Scan all frontend source files for gql`` tagged documents.
   documents: [
