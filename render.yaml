@@ -1,64 +1,84 @@
-# Render Blueprint — Staging environment
+# Render Blueprint — Twitter-Clone (Staging + Production)
 # Docs: https://render.com/docs/blueprint-spec
 #
 # How to use:
 #   1. Push this file to your GitHub repo.
 #   2. In the Render dashboard → New → Blueprint, point to this repo.
-#   3. Render will create both services. Fill in the "sync: false" env vars
-#      in each service's Environment tab (see comments below).
+#   3. Render will sync services into the existing "Twitter-Clone" project
+#      under the correct environment (Staging / Production).
+#   4. Fill in the "sync: false" env vars in each service's Environment tab
+#      (see comments below) — never commit secrets.
 #
-# Deploy order:
-#   - Provision a Neon Postgres database first and copy its connection string.
-#   - Deploy the API service, then the UI service (the UI needs the API URL).
+# Branch → Environment mapping:
+#   develop  →  Staging     (twitter-clone-*-staging services)
+#   main     →  Production  (twitter-clone-* services)
+#
+# Deploy order (first time):
+#   - Provision a Neon Postgres database for each environment and copy the
+#     connection strings.
+#   - Deploy the API services first, then the UI services (the UI needs the
+#     API URL baked in at build time).
 
 services:
-  # ── Backend: NestJS API ─────────────────────────────────────────────────────
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # STAGING  (auto-deploys on push to `develop`)
+  # ════════════════════════════════════════════════════════════════════════════
+
+  # ── Backend: NestJS API — Staging ─────────────────────────────────────────
   - type: web
     name: twitter-clone-api-staging
     runtime: node
-    plan: free           # change to "starter" or higher for production
-    region: ohio         # US East — match your Neon region for lowest latency
+    plan: free
+    region: ohio            # US East — match your Neon region for lowest latency
+    project: Twitter-Clone
+    environment: Staging
+    branch: develop
+    autoDeploy: true
     rootDir: backend/twitter-clone-api
     buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
     # Runs pending TypeORM migrations before each deploy, then starts the app.
     startCommand: node node_modules/typeorm/cli.js migration:run -d dist/data-source.js && node dist/main.js
-    healthCheckPath: /api  # Swagger UI is mounted here; confirms app is up
+    healthCheckPath: /api   # Swagger UI is mounted here; confirms app is up
     envVars:
       - key: NODE_ENV
         value: production
       - key: LOG_LEVEL
         value: info
 
-      # ── Database (Neon) ──────────────────────────────────────────────────────
-      # Paste the Neon "Pooled connection" string from your Neon project dashboard.
+      # ── Database (Neon — staging) ──────────────────────────────────────────
+      # Paste the Neon "Pooled connection" string from your staging Neon project.
       # Format: postgresql://<user>:<password>@<host>/<dbname>?sslmode=require
       - key: DATABASE_URL
-        sync: false       # set manually in the Render dashboard — never commit secrets
+        sync: false
 
-      # ── Clerk ────────────────────────────────────────────────────────────────
+      # ── Clerk ─────────────────────────────────────────────────────────────
       # Use your *staging* Clerk application's keys (or the same test keys).
       - key: CLERK_SECRET_KEY
         sync: false
       - key: CLERK_WEBHOOK_SECRET
         sync: false
 
-      # ── CORS ─────────────────────────────────────────────────────────────────
-      # Set to the Render URL of the frontend service once it is created,
+      # ── CORS ──────────────────────────────────────────────────────────────
+      # Set to the Render URL of the staging frontend service,
       # e.g. https://twitter-clone-ui-staging.onrender.com
       - key: CORS_ORIGIN
         sync: false
 
-  # ── Frontend: Next.js ───────────────────────────────────────────────────────
+  # ── Frontend: Next.js — Staging ───────────────────────────────────────────
   - type: web
     name: twitter-clone-ui-staging
     runtime: node
     plan: free
     region: ohio
+    project: Twitter-Clone
+    environment: Staging
+    branch: develop
+    autoDeploy: true
     rootDir: frontend/twitter-clone-ui
     # After the Next.js build, copy static assets and public files into the
     # standalone directory. The standalone server runs from inside .next/standalone/
-    # and expects these folders to live alongside it — the Dockerfile does this
-    # explicitly; we replicate it here for Render's native Node runtime.
+    # and expects these folders to live alongside it.
     buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm codegen && pnpm build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public
     startCommand: node .next/standalone/server.js
     envVars:
@@ -70,21 +90,101 @@ services:
       - key: HOSTNAME
         value: "0.0.0.0"
 
-      # ── API URL ───────────────────────────────────────────────────────────────
+      # ── API URL ────────────────────────────────────────────────────────────
       # IMPORTANT: NEXT_PUBLIC_* vars are baked in at BUILD time by Next.js.
       # Set this before triggering the first build.
-      # Use the Render URL of the API service above,
       # e.g. https://twitter-clone-api-staging.onrender.com
       - key: NEXT_PUBLIC_API_URL
         sync: false
 
-      # ── Clerk ─────────────────────────────────────────────────────────────────
+      # ── Clerk ─────────────────────────────────────────────────────────────
       - key: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
         sync: false
       - key: CLERK_SECRET_KEY
         sync: false
 
-      # ── Clerk redirect URLs (safe to hard-code) ───────────────────────────────
+      # ── Clerk redirect URLs (safe to hard-code) ───────────────────────────
+      - key: NEXT_PUBLIC_CLERK_SIGN_IN_URL
+        value: /sign-in
+      - key: NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL
+        value: /
+      - key: NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL
+        value: /
+
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # PRODUCTION  (auto-deploys on push to `main`)
+  # ════════════════════════════════════════════════════════════════════════════
+
+  # ── Backend: NestJS API — Production ──────────────────────────────────────
+  - type: web
+    name: twitter-clone-api
+    runtime: node
+    plan: free           # free tier spins down; use "starter" or higher for prod
+    region: ohio
+    project: Twitter-Clone
+    environment: Production
+    branch: main
+    autoDeploy: true
+    rootDir: backend/twitter-clone-api
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm build
+    startCommand: node node_modules/typeorm/cli.js migration:run -d dist/data-source.js && node dist/main.js
+    healthCheckPath: /api
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: LOG_LEVEL
+        value: info
+
+      # ── Database (Neon — production) ───────────────────────────────────────
+      # Use a *separate* Neon project/branch for production data isolation.
+      - key: DATABASE_URL
+        sync: false
+
+      # ── Clerk ─────────────────────────────────────────────────────────────
+      # Use your *production* Clerk application's keys.
+      - key: CLERK_SECRET_KEY
+        sync: false
+      - key: CLERK_WEBHOOK_SECRET
+        sync: false
+
+      # ── CORS ──────────────────────────────────────────────────────────────
+      # e.g. https://twitter-clone-ui.onrender.com  (or your custom domain)
+      - key: CORS_ORIGIN
+        sync: false
+
+  # ── Frontend: Next.js — Production ────────────────────────────────────────
+  - type: web
+    name: twitter-clone-ui
+    runtime: node
+    plan: free
+    region: ohio
+    project: Twitter-Clone
+    environment: Production
+    branch: main
+    autoDeploy: true
+    rootDir: frontend/twitter-clone-ui
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm codegen && pnpm build && cp -r .next/static .next/standalone/.next/static && cp -r public .next/standalone/public
+    startCommand: node .next/standalone/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      - key: HOSTNAME
+        value: "0.0.0.0"
+
+      # ── API URL ────────────────────────────────────────────────────────────
+      # e.g. https://twitter-clone-api.onrender.com  (or your custom domain)
+      - key: NEXT_PUBLIC_API_URL
+        sync: false
+
+      # ── Clerk ─────────────────────────────────────────────────────────────
+      - key: NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+        sync: false
+      - key: CLERK_SECRET_KEY
+        sync: false
+
+      # ── Clerk redirect URLs (safe to hard-code) ───────────────────────────
       - key: NEXT_PUBLIC_CLERK_SIGN_IN_URL
         value: /sign-in
       - key: NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL
