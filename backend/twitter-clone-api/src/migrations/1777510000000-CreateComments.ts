@@ -19,8 +19,12 @@ export class CreateComments1777510000000 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query(`ALTER TABLE "comment" DROP CONSTRAINT "FK_comment_postId"`);
-    await queryRunner.query(`ALTER TABLE "comment" DROP CONSTRAINT "FK_comment_userId"`);
+    await queryRunner.query(
+      `ALTER TABLE "comment" DROP CONSTRAINT "FK_comment_postId"`,
+    );
+    await queryRunner.query(
+      `ALTER TABLE "comment" DROP CONSTRAINT "FK_comment_userId"`,
+    );
     await queryRunner.query(`DROP INDEX "public"."IDX_comment_postId"`);
     await queryRunner.query(`DROP TABLE "comment"`);
   }

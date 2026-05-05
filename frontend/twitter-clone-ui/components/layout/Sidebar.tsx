@@ -2,12 +2,12 @@
 
 import Link from 'next/link';
 import { UserButton } from '@clerk/nextjs';
-import { Home, User } from 'lucide-react';
+import { Home } from 'lucide-react';
 import SidebarLink from './SidebarLink';
 
 const NAV_LINKS = [
   { href: '/', label: 'Home', icon: Home },
-  { href: '/profile', label: 'Profile', icon: User },
+  // { href: '/profile', label: 'Profile', icon: User },
 ];
 
 export default function Sidebar() {
@@ -38,18 +38,18 @@ export default function Sidebar() {
         </nav>
 
         {/* Post button */}
-        <div className="mt-4 flex justify-center xl:justify-start">
-          <Link
-            href="/compose"
-            className="flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-400 text-white font-bold rounded-full transition-colors
-              w-[52px] h-[52px] xl:w-full xl:h-auto xl:px-8 xl:py-3 xl:text-lg"
-            aria-label="Post"
-          >
-            {/* Plus icon shown on narrow sidebar */}
-            <span className="xl:hidden text-2xl leading-none">+</span>
-            <span className="hidden xl:block">Post</span>
-          </Link>
-        </div>
+        {/*<div className="mt-4 flex justify-center xl:justify-start">*/}
+        {/*  <Link*/}
+        {/*    href="/compose"*/}
+        {/*    className="flex items-center justify-center gap-2 bg-sky-500 hover:bg-sky-400 text-white font-bold rounded-full transition-colors*/}
+        {/*      w-[52px] h-[52px] xl:w-full xl:h-auto xl:px-8 xl:py-3 xl:text-lg"*/}
+        {/*    aria-label="Post"*/}
+        {/*  >*/}
+        {/*    /!* Plus icon shown on narrow sidebar *!/*/}
+        {/*    <span className="xl:hidden text-2xl leading-none">+</span>*/}
+        {/*    <span className="hidden xl:block">Post</span>*/}
+        {/*  </Link>*/}
+        {/*</div>*/}
       </div>
 
       {/* Bottom: user */}

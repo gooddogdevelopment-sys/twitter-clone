@@ -4,6 +4,8 @@ import { NotFoundException } from '@nestjs/common';
 import { LikesService } from './likes.service';
 import { Likes } from './entities/likes.entity';
 import { UsersService } from '../users/users.service';
+import { User } from '../users/entities/user.entity';
+import { Post } from '../posts/entities/post.entity';
 
 const mockUser = {
   id: 'user-uuid-1234',
@@ -18,8 +20,8 @@ const mockLike: Likes = {
   isActive: true,
   createdAt: new Date('2024-01-01'),
   updatedAt: new Date('2024-01-01'),
-  user: mockUser as any,
-  post: null as any,
+  user: mockUser as User,
+  post: null as unknown as Post,
 };
 
 const mockLikesRepository = {
